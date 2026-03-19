@@ -304,11 +304,6 @@ button:disabled { background: #333; color: #aaa; cursor: not-allowed; transform:
     </div>
 
     <div>
-        <label>Edad</label>
-        <input type="number" id="edad" required min="18" max="120" placeholder="Ej: 35">
-    </div>
-
-    <div>
         <label>Nacionalidad</label>
         <input type="text" id="nacionalidad" required placeholder="Ej: CHILENA" value="CHILENA">
     </div>
@@ -345,7 +340,11 @@ button:disabled { background: #333; color: #aaa; cursor: not-allowed; transform:
 
     <div>
         <label>Teléfono Principal</label>
-        <input type="tel" id="telefono" required placeholder="Ej: +56912345678">
+        <div style="display: flex; gap: 10px;">
+            <input type="text" value="+56" readonly tabindex="-1" style="width: 70px; text-align: center; color: #aaa; background-color: rgba(0,0,0,0.4);">
+            <input type="tel" id="telefono" required pattern="^[0-9]{9}$" maxlength="9" placeholder="912345678" style="flex: 1;" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        </div>
+        <span class="field-note">Ingrese los 9 dígitos omitiendo el +56</span>
     </div>
 
     <div>
@@ -469,7 +468,7 @@ document.getElementById('comuna').addEventListener('blur', function(e) {
     }
 });
 
-// ─── WEBHOOK DE MAKE ACTUALIZADO ──────────────────────────────────────────────
+// ─── WEBHOOK DE MAKE ─────────────────────────────────────────────────────────
 const WEBHOOK = "https://hook.us2.make.com/at4l7butpyepuhn3iimkm1gu7vp4d2te";
 
 document.getElementById("form").addEventListener("submit", async function(e) {
@@ -485,19 +484,18 @@ document.getElementById("form").addEventListener("submit", async function(e) {
         document.getElementById("licencia_box").scrollIntoView({behavior: "smooth", block: "center"});
     }
 
-    // Preparando los datos requeridos por la plantilla de Word
+    // Se une el prefijo +56 con el input del usuario para enviar el teléfono completo
     const payload = {
         "nombre_completo": document.getElementById('nombre').value,
         "rut": document.getElementById('rut').value,
         "genero": document.getElementById('genero').value,
         "fecha_nacimiento": document.getElementById('fecha_nacimiento').value,
-        "edad": document.getElementById('edad').value,
         "nacionalidad": document.getElementById('nacionalidad').value,
         "estado_civil": document.getElementById('estado_civil').value,
         "direccion": document.getElementById('direccion').value,
         "comuna": document.getElementById('comuna').value,
         "region": document.getElementById('region').value,
-        "numero_telefono": document.getElementById('telefono').value,
+        "numero_telefono": "+56" + document.getElementById('telefono').value,
         "email": document.getElementById('email').value
     };
 
@@ -538,8 +536,6 @@ document.getElementById("form").addEventListener("submit", async function(e) {
             `;
         };
 
-        // Mantengo 'data.licencia' por si tu respuesta de Make sigue llamándose así. 
-        // Si en Make cambiaste el nombre de la variable de retorno, asegúrate de ajustarlo aquí (ej: data.documento).
         const pdfUrl = data.licencia || data.documento || data.url;
 
         if (data.status === "ready" && pdfUrl) {
