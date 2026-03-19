@@ -521,33 +521,40 @@ document.getElementById("form").addEventListener("submit", async function(e) {
 
         const data = await res.json();
 
-        // 🔥 FUNCIÓN DE VISTA PREVIA COMPLETA CON PATRÓN DE MARCA DE AGUA 🔥
-        const applyPreview = (url, watermarkText = "PENDIENTE DE PAGO") => {
-            const safeUrl = url + "#toolbar=0&navpanes=0&scrollbar=0&view=Fit";
-            
-            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280"><text x="50%" y="50%" transform="rotate(-45 140 140)" fill="rgba(0,0,0,0.4)" font-size="32" font-family="sans-serif" font-weight="bold" text-anchor="middle">${watermarkText}</text></svg>`;
-            const encodedSvg = encodeURIComponent(svg).replace(/'/g, "%27").replace(/"/g, "%22");
-            
-            return `
-                <iframe class="pdf-frame" src="${safeUrl}" frameborder="0"></iframe>
-                <div class="anti-download-layer"></div>
-                <div class="watermark" style="background-image: url('data:image/svg+xml;utf8,${encodedSvg}'); background-repeat: repeat; z-index: 99;"></div>
-                <div class="blur-overlay"></div>
-            `;
-        };
+// 🔥 FUNCIÓN DE VISTA PREVIA CON BASE64 → BLOB URL 🔥
+const applyPreview = (blobUrl, watermarkText = "PENDIENTE DE PAGO") => {
+    const safeUrl = blobUrl + "#toolbar=0&navpanes=0&scrollbar=0&view=Fit";
+    
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280"><text x="50%" y="50%" transform="rotate(-45 140 140)" fill="rgba(0,0,0,0.4)" font-size="32" font-family="sans-serif" font-weight="bold" text-anchor="middle">${watermarkText}</text></svg>`;
+    const encodedSvg = encodeURIComponent(svg).replace(/'/g, "%27").replace(/"/g, "%22");
+    
+    return `
+        <iframe class="pdf-frame" src="${safeUrl}" frameborder="0"></iframe>
+        <div class="anti-download-layer"></div>
+        <div class="watermark" style="background-image: url('data:image/svg+xml;utf8,${encodedSvg}'); background-repeat: repeat; z-index: 99;"></div>
+        <div class="blur-overlay"></div>
+    `;
+};
 
-        const pdfUrl = data.licencia || data.documento || data.url;
+if (data.status === "ready" && data.pdf) {
+    btn.innerHTML = "✅ ¡Documento listo!";
+    btn.style.background = "linear-gradient(135deg, #00c853, #00e676)";
 
-        if (data.status === "ready" && pdfUrl) {
-            btn.innerHTML = "✅ ¡Documento listo!";
-            btn.style.background = "linear-gradient(135deg, #00c853, #00e676)";
+    // Convertir base64 → Blob → URL local
+    const byteChars = atob(data.pdf);
+    const byteNumbers = new Uint8Array(byteChars.length);
+    for (let i = 0; i < byteChars.length; i++) {
+        byteNumbers[i] = byteChars.charCodeAt(i);
+    }
+    const blob = new Blob([byteNumbers], { type: "application/pdf" });
+    const blobUrl = URL.createObjectURL(blob);
 
-            document.getElementById("licencia_box").innerHTML = applyPreview(pdfUrl);
-            document.getElementById("licencia_box").classList.add("ready");
+    document.getElementById("licencia_box").innerHTML = applyPreview(blobUrl);
+    document.getElementById("licencia_box").classList.add("ready");
 
-        } else {
-            throw new Error("Respuesta inesperada del servidor.");
-        }
+} else {
+    throw new Error("Respuesta inesperada del servidor.");
+}
 
     } catch (err) {
         clearTimeout(timeoutId);
