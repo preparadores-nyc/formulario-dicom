@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plataforma de Documentos - Informe Comercial (Dicom)</title>
+<link rel="icon" type="image/png" href="https://49659256.fs1.hubspotusercontent-na1.net/hubfs/49659256/PDFS/LOGOS%20AFP/logo%20miniatura%20preparadores%20nyc.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Outfit:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --primary-glow: #0088ff;
+    --secondary-glow: #00d2ff;
+    --glass-bg: rgba(10, 10, 10, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --text-main: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.75);
+    --input-bg: rgba(255, 255, 255, 0.08);
+    --success: #00e676;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body, html {
+    width: 100%; max-width: 100%; overflow-x: hidden;
+    background-color: #000000;
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-main); line-height: 1.6;
+}
+
+body { min-height: 100vh; padding-bottom: 0px; }
+
+/* 🔥 FONDO DE GALAXIA ANIMADO 🔥 */
+.galaxy-bg {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+    background-image: url('https://49659256.fs1.hubspotusercontent-na1.net/hubfs/49659256/PDFS/LOGOS%20AFP/hero%204%20(hermoso).png');
+    background-size: cover; background-position: center; opacity: 0.3; 
+    filter: grayscale(100%); mix-blend-mode: screen; 
+    animation: panSpace 60s alternate infinite linear;
+}
+
+h1, h2, h3, h4, button { font-family: 'Space Grotesk', sans-serif; }
+
+/* ─── NAVEGACIÓN ─── */
+.navbar {
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 5%; background: rgba(0, 0, 0, 0.8); 
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.brand-container { display: flex; align-items: center; gap: 15px; }
+.nav-logo { height: 45px; object-fit: contain; filter: drop-shadow(0 2px 10px rgba(0,136,255,0.4)); }
+
+.brand-name {
+    font-family: 'Cinzel Decorative', serif; font-size: 1.3rem; font-weight: 700;
+    color: #ffffff; letter-spacing: 2px; text-transform: uppercase;
+    text-shadow: 0 0 15px rgba(0, 136, 255, 0.5); line-height: 1;
+}
+
+.hamburger { cursor: pointer; color: white; display: flex; align-items: center; transition: transform 0.3s; }
+.hamburger:hover { transform: scale(1.1); color: var(--secondary-glow); }
+
+/* SIDEBAR (MENÚ LATERAL) */
+.sidebar {
+    position: fixed; top: 0; right: -320px; width: 300px; height: 100vh;
+    background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+    border-left: 1px solid var(--glass-border); z-index: 2000;
+    display: flex; flex-direction: column; padding: 80px 30px 40px 30px;
+    transition: right 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+}
+.sidebar.active { right: 0; }
+.sidebar a { color: var(--text-main); text-decoration: none; font-size: 1.2rem; margin-bottom: 25px; font-weight: 500; transition: all 0.3s; }
+.sidebar a:hover { color: var(--secondary-glow); padding-left: 10px; }
+.close-btn { position: absolute; top: 20px; right: 25px; font-size: 2rem; cursor: pointer; color: var(--text-muted); transition: color 0.3s; }
+.close-btn:hover { color: #fff; }
+.sidebar .nav-btn {
+    margin-top: auto; background: linear-gradient(135deg, var(--primary-glow), #0055ff); 
+    padding: 15px 20px; border-radius: 12px; font-weight: 600; text-align: center; 
+    box-shadow: 0 4px 15px rgba(0, 136, 255, 0.3); transition: all 0.3s ease;
+}
+.sidebar .nav-btn:hover { padding-left: 20px; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 136, 255, 0.5); color: #fff; }
+
+.sidebar-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.6); z-index: 1500; display: none; opacity: 0; transition: opacity 0.4s;
+}
+.sidebar-overlay.active { display: block; opacity: 1; }
+
+/* ANIMACIONES */
+@keyframes fadeUp { 0% { opacity: 0; transform: translateY(40px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); } 40% { transform: translateY(-15px) translateX(-50%); } 60% { transform: translateY(-7px) translateX(-50%); } }
+@keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(0, 136, 255, 0.3); } 50% { box-shadow: 0 0 25px rgba(0, 136, 255, 0.6); } 100% { box-shadow: 0 0 10px rgba(0, 136, 255, 0.3); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+@keyframes mobileFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+@keyframes panSpace { 0% { transform: scale(1); background-position: 0% 0%; } 100% { transform: scale(1.15); background-position: 100% 100%; } }
+
+/* ─── HERO SECTION ─── */
+.hero-section { position: relative; width: 100%; height: 100vh; display: flex; justify-content: center; align-items: flex-end; overflow: hidden; background-color: transparent; padding: 0; }
+.hero-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; z-index: 2; animation: fadeUp 1s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+.banner-web { display: block; }
+.banner-mobile { display: none; }
+.scroll-arrow {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10; cursor: pointer;
+    background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid var(--glass-border);
+    border-radius: 50%; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center;
+    animation: bounce 2.5s infinite; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.scroll-arrow:hover { background: var(--primary-glow); animation: pulseGlow 1.5s infinite; transform: translateX(-50%) scale(1.1); }
+.scroll-arrow svg { width: 30px; height: 30px; stroke: #fff; transition: transform 0.3s; }
+.scroll-arrow:hover svg { transform: translateY(3px); }
+
+/* LAYOUT */
+.container { max-width: 1440px; width: 100%; margin: 60px auto 40px auto; display: flex; flex-direction: row; gap: clamp(20px, 3vw, 40px); padding: 0 20px; align-items: flex-start; z-index: 5; position: relative; }
+.form-panel { flex: 1.2; min-width: 0; }
+.preview-panel { flex: 1; min-width: 0; position: sticky; top: 100px; display: flex; flex-direction: column; gap: 25px; }
+
+.card {
+    background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-radius: 24px;
+    padding: clamp(25px, 5vw, 40px); box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+    border: 1px solid var(--glass-border); width: 100%; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+}
+.card:hover { box-shadow: 0 25px 50px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.2); }
+h2 { margin-bottom: 20px; font-size: clamp(1.4rem, 4vw, 1.8rem); font-weight: 700; background: linear-gradient(135deg, #fff, var(--secondary-glow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: capitalize; }
+.subtitle { color: var(--text-muted); font-size: clamp(0.85rem, 2vw, 0.95rem); margin-top: -15px; margin-bottom: 30px; font-weight: 300; }
+.info-box { background: rgba(0, 136, 255, 0.1); border-left: 4px solid var(--primary-glow); padding: 15px 20px; border-radius: 0 10px 10px 0; margin-bottom: 30px; font-size: 0.95rem; color: var(--text-muted); }
+.info-box strong { color: var(--text-main); font-weight: 600; }
+
+/* FORM */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(15px, 3vw, 25px); }
+.full { grid-column: span 2; }
+label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: var(--text-muted); text-transform: capitalize; }
+input, select {
+    width: 100%; max-width: 100%; padding: clamp(12px, 2vw, 15px) 15px; border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px; font-size: 1rem; background-color: var(--input-bg); color: var(--text-main);
+    transition: all 0.3s ease; backdrop-filter: blur(10px); color-scheme: dark;
+}
+input::placeholder { color: rgba(255,255,255,0.3); transition: opacity 0.3s; }
+select option { background-color: #111827; color: #fff; }
+input:focus, select:focus { outline: none; border-color: var(--primary-glow); background-color: rgba(255, 255, 255, 0.15); box-shadow: 0 0 15px rgba(0, 136, 255, 0.3); transform: translateY(-2px); }
+input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.7; cursor: pointer; }
+input[readonly] { background-color: rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.05); color: #aaa; cursor: not-allowed; }
+input[readonly]:focus { box-shadow: none; border-color: rgba(255,255,255,0.05); transform: none; }
+.field-note { font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; display: block; font-style: italic; }
+
+button {
+    background: linear-gradient(135deg, var(--primary-glow), #0055ff); color: white; border: none; padding: 16px 24px;
+    width: 100%; border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    margin-top: 10px; letter-spacing: 1px; grid-column: span 2; box-shadow: 0 8px 20px rgba(0, 136, 255, 0.3); text-transform: capitalize;
+}
+button:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(0, 136, 255, 0.5); background: linear-gradient(135deg, #0099ff, #0044ff); }
+button:disabled { background: #333; color: #aaa; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.spinner { width: 40px; height: 40px; border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: var(--secondary-glow); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+.loading-text { font-size: 0.9rem; color: var(--text-main); font-weight: 500; animation: pulse 1.5s infinite; }
+
+/* DOCUMENT PREVIEW */
+.preview-box {
+    background: rgba(0,0,0,0.5); border-radius: 16px; aspect-ratio: 1 / 1.35; width: 100%; height: auto; 
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); text-align: center; position: relative; overflow: hidden; border: 1px dashed rgba(255,255,255,0.2); flex-direction: column; transition: all 0.4s ease;
+}
+.preview-box:not(.ready) { min-height: 400px; }
+.preview-box.ready { border-color: rgba(0,230,118,0.5); border-style: solid; background: rgba(0,0,0,0.8); }
+
+.anti-download-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; background: transparent; cursor: default; }
+.pdf-frame { width: 100%; height: 100%; border: none; opacity: 0; animation: fadeUp 0.8s ease forwards 0.2s; z-index: 1; position: relative; pointer-events: none; }
+
+/* 🔥 MARCA DE AGUA SOBRE EL DOCUMENTO 🔥 */
+.watermark { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99; }
+
+/* 🔥 EFECTO DIFUMINADO: INTENSO (40px), SIN FONDO NEGRO Y AL 50% 🔥 */
+.blur-overlay { 
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 30%;
+    backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); 
+    background: transparent;
+    mask-image: linear-gradient(to top, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%); 
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%); 
+    pointer-events: none; z-index: 25; 
+}
+
+
+/* 🔥 SECCIÓN DE PAGO 🔥 */
+.footer-sec { background: #000000; border-top: 1px solid var(--glass-border); padding: 60px 20px; text-align: center; position: relative; z-index: 10; }
+.footer-logo { height: 60px; margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(0,136,255,0.3)); }
+.footer-sec h2 { margin-bottom: 10px; font-size: 2.2rem; }
+.footer-sec p { color: var(--text-muted); margin-bottom: 30px; }
+.footer-btns { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+.btn-pay { display: inline-block; background: linear-gradient(135deg, #00e676, #00c853); color: #000; padding: 16px 40px; border-radius: 50px; font-weight: 700; font-size: 1.1rem; text-decoration: none; box-shadow: 0 10px 25px rgba(0, 230, 118, 0.3); transition: all 0.3s; }
+.btn-pay:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0, 230, 118, 0.5); }
+.btn-other { display: inline-block; background: transparent; border: 2px solid var(--primary-glow); color: var(--text-main); padding: 14px 40px; border-radius: 50px; font-weight: 600; font-size: 1.1rem; text-decoration: none; transition: all 0.3s; }
+.btn-other:hover { background: var(--primary-glow); color: #fff; box-shadow: 0 10px 25px rgba(0, 136, 255, 0.3); }
+
+/* ─── SECCIÓN TESTIMONIOS ─── */
+.testimonials-sec { max-width: 1440px; margin: 60px auto 60px auto; padding: 0 20px; z-index: 5; position: relative; }
+.testimonials-sec h2 { text-align: center; font-size: 2rem; margin-bottom: 40px; }
+.test-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+.test-card { background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 30px; text-align: center; }
+.test-card p { font-style: italic; color: #d1d1d1; margin-bottom: 15px; font-size: 0.95rem; }
+.test-card h4 { color: var(--primary-glow); font-size: 1.1rem; }
+.stars { color: #ffb400; margin-bottom: 10px; font-size: 1.2rem; }
+
+/* WHATSAPP FLOAT */
+.whatsapp-float { position: fixed; bottom: 30px; right: 30px; background: var(--glass-bg); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.2); border-radius: 50px; padding: 8px 20px 8px 8px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-main); z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); transition: all 0.3s; }
+.whatsapp-float:hover { transform: translateY(-5px) scale(1.02); border-color: #25D366; background: rgba(15, 20, 30, 0.9); }
+.wa-logo { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+.wa-text span { font-size: 1rem; font-weight: 700; }
+.wa-text small { font-size: 0.75rem; color: #25D366; font-weight: 500; }
+
+/* MOBILE */
+@media (max-width: 992px) {
+    .nav-links { display: none; } 
+    .navbar { padding: 15px 20px; }
+    .brand-name { font-size: 1rem; letter-spacing: 1px; } 
+    .banner-web { display: none; } 
+    .banner-mobile { display: block; left: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; z-index: 2; animation: fadeUp 1s cubic-bezier(0.25, 1, 0.5, 1) forwards, mobileFloat 6s ease-in-out infinite 1s; }
+    .hero-section { padding: 0; } 
+    .container { flex-direction: column; gap: 0; padding: 0 !important; margin: 0 !important; width: 100%; max-width: 100%; }
+    .form-panel, .preview-panel { width: 100%; } .preview-panel { position: relative; top: 0; }
+    .card { border-radius: 0 !important; border-left: none !important; border-right: none !important; padding: 30px 15px !important; margin: 0 0 15px 0 !important; width: 100%; }
+    .form-grid { grid-template-columns: 1fr; gap: 15px; } .full { grid-column: span 1; } button { grid-column: span 1; }
+    .whatsapp-float { bottom: 20px; right: 15px; padding: 6px 15px 6px 6px; } .wa-logo { width: 40px; height: 40px; } .wa-text span { font-size: 0.9rem; }
+    .footer-btns { flex-direction: column; gap: 15px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="galaxy-bg"></div>
+
+<header class="navbar">
+    <div class="brand-container">
+        <img src="https://49659256.fs1.hubspotusercontent-na1.net/hubfs/49659256/PDFS/LOGOS%20AFP/logo%20nyc%20(no%20background).png" alt="NYC Preparadores Logo" class="nav-logo">
+        <span class="brand-name">Preparadores NYC</span>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">
+        <svg width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleMenu()"></div>
+<div class="sidebar" id="sidebar">
+    <div class="close-btn" onclick="toggleMenu()">✕</div>
+    <a href="#inicio" onclick="toggleMenu()">Inicio</a>
+    <a href="#seccion-formulario" onclick="toggleMenu()">Emitir Documento</a>
+    <a href="#testimonios" onclick="toggleMenu()">Testimonios</a>
+    <a href="https://wa.me/56933686427" target="_blank" class="nav-btn" onclick="toggleMenu()">Asistencia</a>
+</div>
+
+<div class="hero-section" id="inicio">
+    <img src="https://49659256.fs1.hubspotusercontent-na1.net/hubfs/49659256/PDFS/LOGOS%20AFP/hero%204%20(hermoso).png" alt="NYC Preparadores Web" class="hero-image banner-web">
+    <img src="https://49659256.fs1.hubspotusercontent-na1.net/hubfs/49659256/PDFS/LOGOS%20AFP/hero%204%20(hermoso).png" alt="NYC Preparadores Mobile" class="hero-image banner-mobile">
+    
+    <div class="scroll-arrow" onclick="document.getElementById('seccion-formulario').scrollIntoView({behavior: 'smooth'})">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </div>
+</div>
+
+<div class="container" id="seccion-formulario">
+<div class="form-panel">
+<div class="card">
+<h2>Emisión de Informe Comercial (Dicom)</h2>
+<div class="info-box">
+    En <strong>NYC Preparadores</strong>, facilitamos la obtención de tu historial financiero. Al ingresar tus datos, nuestro sistema generará un <strong>Informe Comercial detallado (Sin Deudas)</strong> asegurando una presentación impecable para tus trámites y arriendos.
+</div>
+
+<form id="form" class="form-grid">
+    <div class="full">
+        <label>Nombre Completo</label>
+        <input id="nombre" required placeholder="Ej: JUAN PÉREZ GONZÁLEZ">
+    </div>
+    
+    <div>
+        <label>RUT</label>
+        <input id="rut" required pattern="^[0-9]+-[0-9Kk]$" maxlength="10" placeholder="Ej: 15036467-1">
+    </div>
+
+    <div>
+        <label>Género</label>
+        <select id="genero" required>
+            <option value="" disabled selected>Seleccione género</option>
+            <option value="MASCULINO">Masculino</option>
+            <option value="FEMENINO">Femenino</option>
+        </select>
+    </div>
+
+    <div>
+        <label>Fecha de Nacimiento</label>
+        <input type="date" id="fecha_nacimiento" required>
+    </div>
+
+    <div>
+        <label>Edad</label>
+        <input type="number" id="edad" required min="18" max="120" placeholder="Ej: 35">
+    </div>
+
+    <div>
+        <label>Nacionalidad</label>
+        <input type="text" id="nacionalidad" required placeholder="Ej: CHILENA" value="CHILENA">
+    </div>
+
+    <div>
+        <label>Estado Civil</label>
+        <select id="estado_civil" required>
+            <option value="" disabled selected>Seleccione estado civil</option>
+            <option value="SOLTERO(A)">Soltero(a)</option>
+            <option value="CASADO(A)">Casado(a)</option>
+            <option value="VIUDO(A)">Viudo(a)</option>
+            <option value="DIVORCIADO(A)">Divorciado(a)</option>
+        </select>
+    </div>
+
+    <div class="full">
+        <label>Dirección</label>
+        <input type="text" id="direccion" required placeholder="Ej: AV. PROVIDENCIA 1234, DEPTO 45">
+    </div>
+
+    <div>
+        <label>Comuna</label>
+        <input type="text" id="comuna" list="lista-comunas" required placeholder="Escriba para buscar... Ej: LA SERENA">
+        <datalist id="lista-comunas">
+            <!-- LISTA DE COMUNAS MANTENIDA IGUAL -->
+            <option value="ALGARROBO"><option value="ALHUÉ"><option value="ALTO BIOBÍO"><option value="ALTO DEL CARMEN"><option value="ALTO HOSPICIO"><option value="ANCUD"><option value="ANDACOLLO"><option value="ANGOL"><option value="ANTÁRTICA"><option value="ANTOFAGASTA"><option value="ANTUCO"><option value="ARAUCO"><option value="ARICA"><option value="AYSÉN"><option value="BUIN"><option value="BULNES"><option value="CABILDO"><option value="CABO DE HORNOS"><option value="CABRERO"><option value="CALAMA"><option value="CALBUCO"><option value="CALDERA"><option value="CALERA DE TANGO"><option value="CALLE LARGA"><option value="CAMARONES"><option value="CAMIÑA"><option value="CANELA"><option value="CAÑETE"><option value="CARAHUE"><option value="CARTAGENA"><option value="CASABLANCA"><option value="CASTRO"><option value="CATEMU"><option value="CAUQUENES"><option value="CERRILLOS"><option value="CERRO NAVIA"><option value="CHAITÉN"><option value="CHANCO"><option value="CHAÑARAL"><option value="CHÉPICA"><option value="CHIGUAYANTE"><option value="CHILE CHICO"><option value="CHILLÁN"><option value="CHILLÁN VIEJO"><option value="CHIMBARONGO"><option value="CHOLCHOL"><option value="CHONCHI"><option value="CISNES"><option value="COBQUECURA"><option value="COCHAMÓ"><option value="COCHRANE"><option value="CODEGUA"><option value="COELEMU"><option value="COIHUECO"><option value="COINCO"><option value="COLBÚN"><option value="COLCHANE"><option value="COLINA"><option value="COLLIPULLI"><option value="COLTAUCO"><option value="COMBARBALÁ"><option value="CONCEPCIÓN"><option value="CONCHALÍ"><option value="CONCÓN"><option value="CONSTITUCIÓN"><option value="CONTULMO"><option value="COPIAPÓ"><option value="COQUIMBO"><option value="CORONEL"><option value="CORRAL"><option value="COYHAIQUE"><option value="CUNCO"><option value="CURACAUTÍN"><option value="CURACAVÍ"><option value="CURACO DE VÉLEZ"><option value="CURANILAHUE"><option value="CURARREHUE"><option value="CUREPTO"><option value="CURICÓ"><option value="DALCAHUE"><option value="DIEGO DE ALMAGRO"><option value="DOÑIHUE"><option value="EL BOSQUE"><option value="EL CARMEN"><option value="EL MONTE"><option value="EL QUISCO"><option value="EL TABO"><option value="EMPEDRADO"><option value="ERCILLA"><option value="ESTACIÓN CENTRAL"><option value="FLORIDA"><option value="FREIRE"><option value="FREIRINA"><option value="FRESIA"><option value="FRUTILLAR"><option value="FUTALEUFÚ"><option value="FUTRONO"><option value="GALVARINO"><option value="GENERAL LAGOS"><option value="GORBEA"><option value="GRANEROS"><option value="GUAITECAS"><option value="HIJUELAS"><option value="HUALAIHUÉ"><option value="HUALAÑÉ"><option value="HUALPÉN"><option value="HUALQUI"><option value="HUARA"><option value="HUASCO"><option value="HUECHURABA"><option value="ILLAPEL"><option value="INDEPENDENCIA"><option value="IQUIQUE"><option value="ISLA DE MAIPO"><option value="ISLA DE PASCUA"><option value="JUAN FERNÁNDEZ"><option value="LA CALERA"><option value="LA CISTERNA"><option value="LA CRUZ"><option value="LA ESTRELLA"><option value="LA FLORIDA"><option value="LA GRANJA"><option value="LA HIGUERA"><option value="LA LIGUA"><option value="LA PINTANA"><option value="LA REINA"><option value="LA SERENA"><option value="LA UNIÓN"><option value="LAGO RANCO"><option value="LAGO VERDE"><option value="LAGUNA BLANCA"><option value="LAJA"><option value="LAMPA"><option value="LANCO"><option value="LAS CABRAS"><option value="LAS CONDES"><option value="LAUTARO"><option value="LEBU"><option value="LICANTÉN"><option value="LIMACHE"><option value="LINARES"><option value="LITUECHE"><option value="LLAILLAY"><option value="LLANQUIHUE"><option value="LO BARNECHEA"><option value="LO ESPEJO"><option value="LO PRADO"><option value="LOLOL"><option value="LONCOCHE"><option value="LONGAVÍ"><option value="LONQUIMAY"><option value="LOS ÁLAMOS"><option value="LOS ANDES"><option value="LOS ÁNGELES"><option value="LOS LAGOS"><option value="LOS MUERMOS"><option value="LOS SAUCES"><option value="LOS VILOS"><option value="LOTA"><option value="LUMACO"><option value="MACHALÍ"><option value="MACUL"><option value="MÁFIL"><option value="MAIPÚ"><option value="MALLOA"><option value="MARCHIHUE"><option value="MARÍA ELENA"><option value="MARÍA PINTO"><option value="MARIQUINA"><option value="MAULE"><option value="MAULLÍN"><option value="MEJILLONES"><option value="MELIPEUCO"><option value="MELIPILLA"><option value="MOLINA"><option value="MONTE PATRIA"><option value="MOSTAZAL"><option value="MULCHÉN"><option value="NACIMIENTO"><option value="NANCAGUA"><option value="NATALES"><option value="NAVIDAD"><option value="NEGRETE"><option value="NINHUE"><option value="ÑIQUÉN"><option value="NOGALES"><option value="NUEVA IMPERIAL"><option value="ÑUÑOA"><option value="O'HIGGINS"><option value="OLIVAR"><option value="OLLAGÜE"><option value="OLMUÉ"><option value="OSORNO"><option value="OVALLE"><option value="PADRE HURTADO"><option value="PADRE LAS CASAS"><option value="PAIHUANO"><option value="PAILLACO"><option value="PAINE"><option value="PALENA"><option value="PALMILLA"><option value="PANGUIPULLI"><option value="PANQUEHUE"><option value="PAPUDO"><option value="PAREDONES"><option value="PARRAL"><option value="PELARCO"><option value="PELLUHUE"><option value="PEMUCO"><option value="PENCAHUE"><option value="PENCO"><option value="PEÑAFLOR"><option value="PEÑALOLÉN"><option value="PERALILLO"><option value="PERQUENCO"><option value="PETORCA"><option value="PEUMO"><option value="PICA"><option value="PICHIDEGUA"><option value="PICHILEMU"><option value="PINTO"><option value="PIRQUE"><option value="PITRUFQUÉN"><option value="PLACILLA"><option value="PORTEZUELO"><option value="PORVENIR"><option value="POZO ALMONTE"><option value="PRIMAVERA"><option value="PROVIDENCIA"><option value="PUCHUNCAVÍ"><option value="PUCÓN"><option value="PUDAHUEL"><option value="PUENTE ALTO"><option value="PUERTO MONTT"><option value="PUERTO OCTAY"><option value="PUERTO VARAS"><option value="PUMANQUE"><option value="PUNITAQUI"><option value="PUNTA ARENAS"><option value="PUQUELDÓN"><option value="PURÉN"><option value="PURRANQUE"><option value="PUTAENDO"><option value="PUTRE"><option value="PUYEHUE"><option value="QUEILÉN"><option value="QUELLÓN"><option value="QUEMCHI"><option value="QUILACO"><option value="QUILICURA"><option value="QUILLECO"><option value="QUILLÓN"><option value="QUILLOTA"><option value="QUILPUÉ"><option value="QUINCHAO"><option value="QUINTA DE TILCOCO"><option value="QUINTA NORMAL"><option value="QUINTERO"><option value="QUIRIHUE"><option value="RANCAGUA"><option value="RÁNQUIL"><option value="RAUCO"><option value="RECOLETA"><option value="RENAICO"><option value="RENCA"><option value="RENGO"><option value="REQUÍNOA"><option value="RETIRO"><option value="RINCONADA"><option value="RÍO BUENO"><option value="RÍO CLARO"><option value="RÍO HURTADO"><option value="RÍO IBÁÑEZ"><option value="RÍO NEGRO"><option value="RÍO VERDE"><option value="ROMERAL"><option value="SAAVEDRA"><option value="SAGRADA FAMILIA"><option value="SALAMANCA"><option value="SAN ANTONIO"><option value="SAN BERNARDO"><option value="SAN CARLOS"><option value="SAN CLEMENTE"><option value="SAN ESTEBAN"><option value="SAN FABIÁN"><option value="SAN FELIPE"><option value="SAN FERNANDO"><option value="SAN GREGORIO"><option value="SAN IGNACIO"><option value="SAN JAVIER"><option value="SAN JOAQUÍN"><option value="SAN JOSÉ DE MAIPO"><option value="SAN JUAN DE LA COSTA"><option value="SAN MIGUEL"><option value="SAN PABLO"><option value="SAN PEDRO"><option value="SAN PEDRO DE ATACAMA"><option value="SAN PEDRO DE LA PAZ"><option value="SAN RAFAEL"><option value="SAN RAMÓN"><option value="SAN ROSENDO"><option value="SAN VICENTE"><option value="SANTA BÁRBARA"><option value="SANTA CRUZ"><option value="SANTA JUANA"><option value="SANTA MARÍA"><option value="SANTIAGO"><option value="SANTO DOMINGO"><option value="SIERRA GORDA"><option value="TALAGANTE"><option value="TALCA"><option value="TALCAHUANO"><option value="TALTAL"><option value="TEMUCO"><option value="TENO"><option value="TEODORO SCHMIDT"><option value="TIERRA AMARILLA"><option value="TILTIL"><option value="TIMAUKEL"><option value="TIRÚA"><option value="TOCOPILLA"><option value="TOLTÉN"><option value="TOMÉ"><option value="TORRES DEL PAINE"><option value="TORTEL"><option value="TRAIGUÉN"><option value="TREHUACO"><option value="TUCAPEL"><option value="VALDIVIA"><option value="VALLENAR"><option value="VALPARAÍSO"><option value="VICHUQUÉN"><option value="VICTORIA"><option value="VICUÑA"><option value="VILCÚN"><option value="VILLA ALEGRE"><option value="VILLA ALEMANA"><option value="VILLARRICA"><option value="VIÑA DEL MAR"><option value="VITACURA"><option value="YERBAS BUENAS"><option value="YUMBEL"><option value="YUNGAY"><option value="ZAPALLAR">
+        </datalist>
+    </div>
+
+    <div>
+        <label>Región</label>
+        <input type="text" id="region" required readonly placeholder="Se autocompleta con la comuna">
+    </div>
+
+    <div>
+        <label>Teléfono Principal</label>
+        <input type="tel" id="telefono" required placeholder="Ej: +56912345678">
+    </div>
+
+    <div>
+        <label>Email</label>
+        <input type="email" id="email" required placeholder="Ej: correo@gmail.com">
+    </div>
+
+    <button type="submit" id="btnSubmit">Procesar emisión</button>
+</form>
+</div>
+</div>
+
+<div class="preview-panel">
+<div class="card" style="padding-bottom: 25px;">
+<h2>Documento Nativo</h2>
+
+<div class="preview-box" id="licencia_box">
+<span style="color:var(--text-muted); font-size:0.9rem;">Esperando informe...</span>
+</div>
+
+</div>
+</div>
+</div>
+
+<section class="footer-sec">
+    <img src="https://49659256.fs1.hubspotusercontent-na1.net/hubfs/49659256/PDFS/LOGOS%20AFP/logo%20miniatura%20preparadores%20nyc.png" class="footer-logo" alt="NYC Logo Mini">
+    <h2>¿Listo para tramitar tu certificado?</h2>
+    <p>Si ya visualizaste tu documento y la simulación está correcta, procede para liberar la descarga.</p>
+    <div class="footer-btns">
+        <a href="https://wa.me/56933686427" target="_blank" class="btn-pay">Pagar Informe Comercial ($15.000)</a>
+        <a href="#" class="btn-other">Ver Otros Productos</a>
+    </div>
+</section>
+
+<section id="testimonios" class="testimonials-sec">
+    <h2>Lo que dicen nuestros clientes</h2>
+    <div class="test-grid">
+        <div class="test-card">
+            <div class="stars">★★★★★</div>
+            <p>"Excelente servicio. Logré arrendar mi departamento en providencia en tiempo récord. Documentos impecables."</p>
+            <h4>— Camila V.</h4>
+        </div>
+        <div class="test-card">
+            <div class="stars">★★★★★</div>
+            <p>"La velocidad es increíble. En minutos pude previsualizar todo y tras el pago me llegó al correo. Totalmente recomendados."</p>
+            <h4>— Diego S.</h4>
+        </div>
+        <div class="test-card">
+            <div class="stars">★★★★★</div>
+            <p>"Tenía miedo de que la corredora me rechazara, pero pasó sin problemas. DICOM y liquidaciones perfectas."</p>
+            <h4>— Andrea R.</h4>
+        </div>
+    </div>
+</section>
+
+<a href="https://wa.me/56933686427" target="_blank" class="whatsapp-float">
+    <img src="https://49659256.fs1.hubspotusercontent-na1.net/hubfs/49659256/PDFS/LOGOS%20AFP/LOGO%20WHATSAPP.png" alt="WhatsApp" class="wa-logo">
+    <div class="wa-text"><span>¿Asistencia?</span><small>● Ejecutivo en línea</small></div>
+</a>
+
+<script>
+function toggleMenu() {
+    document.getElementById('sidebar').classList.toggle('active');
+    document.getElementById('sidebar-overlay').classList.toggle('active');
+}
+
+// ─── FORMATEADOR DE RUT CHILENO (SIN PUNTOS, CON GUION) ──────────────────────
+document.getElementById('rut').addEventListener('input', function(e) {
+    let valor = e.target.value.replace(/[^0-9kK]/g, '').toUpperCase();
+    if (valor.length === 0) { e.target.value = ''; return; }
+    if (valor.length <= 1) { e.target.value = valor; return; }
+    let cuerpo = valor.slice(0, -1);
+    let dv = valor.slice(-1);
+    e.target.value = cuerpo + '-' + dv;
+});
+
+// ─── LÓGICA DE AUTOCOMPLETADO DE REGIÓN ───────────────────────────────────────
+const regionesChile = {
+    "REGIÓN DE ARICA Y PARINACOTA": ["ARICA", "CAMARONES", "PUTRE", "GENERAL LAGOS"],
+    "REGIÓN DE TARAPACÁ": ["IQUIQUE", "ALTO HOSPICIO", "POZO ALMONTE", "CAMIÑA", "COLCHANE", "HUARA", "PICA"],
+    "REGIÓN DE ANTOFAGASTA": ["ANTOFAGASTA", "MEJILLONES", "SIERRA GORDA", "TALTAL", "CALAMA", "OLLAGÜE", "SAN PEDRO DE ATACAMA", "TOCOPILLA", "MARÍA ELENA"],
+    "REGIÓN DE ATACAMA": ["COPIAPÓ", "CALDERA", "TIERRA AMARILLA", "CHAÑARAL", "DIEGO DE ALMAGRO", "VALLENAR", "ALTO DEL CARMEN", "FREIRINA", "HUASCO"],
+    "REGIÓN DE COQUIMBO": ["LA SERENA", "COQUIMBO", "ANDACOLLO", "LA HIGUERA", "PAIHUANO", "VICUÑA", "ILLAPEL", "CANELA", "LOS VILOS", "SALAMANCA", "OVALLE", "COMBARBALÁ", "MONTE PATRIA", "PUNITAQUI", "RÍO HURTADO"],
+    "REGIÓN DE VALPARAÍSO": ["VALPARAÍSO", "CASABLANCA", "CONCÓN", "JUAN FERNÁNDEZ", "PUCHUNCAVÍ", "QUINTERO", "VIÑA DEL MAR", "ISLA DE PASCUA", "LOS ANDES", "CALLE LARGA", "RINCONADA", "SAN ESTEBAN", "LA LIGUA", "CABILDO", "PAPUDO", "PETORCA", "ZAPALLAR", "QUILLOTA", "LA CALERA", "HIJUELAS", "LA CRUZ", "NOGALES", "SAN ANTONIO", "ALGARROBO", "CARTAGENA", "EL QUISCO", "EL TABO", "SANTO DOMINGO", "SAN FELIPE", "CATEMU", "LLAILLAY", "PANQUEHUE", "PUTAENDO", "SANTA MARÍA", "QUILPUÉ", "LIMACHE", "OLMUÉ", "VILLA ALEMANA"],
+    "REGIÓN METROPOLITANA DE SANTIAGO": ["CERRILLOS", "CERRO NAVIA", "CONCHALÍ", "EL BOSQUE", "ESTACIÓN CENTRAL", "HUECHURABA", "INDEPENDENCIA", "LA CISTERNA", "LA FLORIDA", "LA GRANJA", "LA PINTANA", "LA REINA", "LAS CONDES", "LO BARNECHEA", "LO ESPEJO", "LO PRADO", "MACUL", "MAIPÚ", "ÑUÑOA", "PEDRO AGUIRRE CERDA", "PEÑALOLÉN", "PROVIDENCIA", "PUDAHUEL", "QUILICURA", "QUINTA NORMAL", "RECOLETA", "RENCA", "SAN JOAQUÍN", "SAN MIGUEL", "SAN RAMÓN", "SANTIAGO", "VITACURA", "PUENTE ALTO", "PIRQUE", "SAN JOSÉ DE MAIPO", "COLINA", "LAMPA", "TILTIL", "SAN BERNARDO", "BUIN", "CALERA DE TANGO", "PAINE", "MELIPILLA", "ALHUÉ", "CURACAVÍ", "MARÍA PINTO", "SAN PEDRO", "TALAGANTE", "EL MONTE", "ISLA DE MAIPO", "PADRE HURTADO", "PEÑAFLOR"],
+    "REGIÓN DEL LIBERTADOR GRAL. BERNARDO O'HIGGINS": ["RANCAGUA", "CODEGUA", "COINCO", "COLTAUCO", "DOÑIHUE", "GRANEROS", "LAS CABRAS", "MACHALÍ", "MALLOA", "MOSTAZAL", "OLIVAR", "PEUMO", "PICHIDEGUA", "QUINTA DE TILCOCO", "RENGO", "REQUÍNOA", "SAN VICENTE", "PICHILEMU", "LA ESTRELLA", "LITUECHE", "MARCHIHUE", "NAVIDAD", "PAREDONES", "SAN FERNANDO", "CHÉPICA", "CHIMBARONGO", "LOLOL", "NANCAGUA", "PALMILLA", "PERALILLO", "PLACILLA", "PUMANQUE", "SANTA CRUZ"],
+    "REGIÓN DEL MAULE": ["TALCA", "CONSTITUCIÓN", "CUREPTO", "EMPEDRADO", "MAULE", "PELARCO", "PENCAHUE", "RÍO CLARO", "SAN CLEMENTE", "SAN RAFAEL", "CAUQUENES", "CHANCO", "PELLUHUE", "CURICÓ", "HUALAÑÉ", "LICANTÉN", "MOLINA", "RAUCO", "ROMERAL", "SAGRADA FAMILIA", "TENO", "VICHUQUÉN", "LINARES", "COLBÚN", "LONGAVÍ", "PARRAL", "RETIRO", "SAN JAVIER", "VILLA ALEGRE", "YERBAS BUENAS"],
+    "REGIÓN DE ÑUBLE": ["COBQUECURA", "COELEMU", "NINHUE", "PORTEZUELO", "QUIRIHUE", "RÁNQUIL", "TREHUACO", "BULNES", "CHILLÁN VIEJO", "CHILLÁN", "EL CARMEN", "PEMUCO", "PINTO", "QUILLÓN", "SAN IGNACIO", "YUNGAY", "COIHUECO", "ÑIQUÉN", "SAN CARLOS", "SAN FABIÁN", "SAN NICOLÁS"],
+    "REGIÓN DEL BIOBÍO": ["CONCEPCIÓN", "CORONEL", "CHIGUAYANTE", "FLORIDA", "HUALQUI", "LOTA", "PENCO", "SAN PEDRO DE LA PAZ", "SANTA JUANA", "TALCAHUANO", "TOMÉ", "HUALPÉN", "LEBU", "ARAUCO", "CAÑETE", "CONTULMO", "CURANILAHUE", "LOS ÁLAMOS", "TIRÚA", "LOS ÁNGELES", "ANTUCO", "CABRERO", "LAJA", "MULCHÉN", "NACIMIENTO", "NEGRETE", "QUILACO", "QUILLECO", "SAN ROSENDO", "SANTA BÁRBARA", "TUCAPEL", "YUMBEL", "ALTO BIOBÍO"],
+    "REGIÓN DE LA ARAUCANÍA": ["TEMUCO", "CARAHUE", "CUNCO", "CURARREHUE", "FREIRE", "GALVARINO", "GORBEA", "LAUTARO", "LONCOCHE", "MELIPEUCO", "NUEVA IMPERIAL", "PADRE LAS CASAS", "PERQUENCO", "PITRUFQUÉN", "PUCÓN", "SAAVEDRA", "TEODORO SCHMIDT", "TOLTÉN", "VILCÚN", "VILLARRICA", "CHOLCHOL", "ANGOL", "COLLIPULLI", "CURACAUTÍN", "ERCILLA", "LONQUIMAY", "LOS SAUCES", "LUMACO", "PURÉN", "RENAICO", "TRAIGUÉN", "VICTORIA"],
+    "REGIÓN DE LOS RÍOS": ["VALDIVIA", "CORRAL", "LANCO", "LOS LAGOS", "MÁFIL", "MARIQUINA", "PAILLACO", "PANGUIPULLI", "LA UNIÓN", "FUTRONO", "LAGO RANCO", "RÍO BUENO"],
+    "REGIÓN DE LOS LAGOS": ["PUERTO MONTT", "CALBUCO", "COCHAMÓ", "FRESIA", "FRUTILLAR", "LOS MUERMOS", "LLANQUIHUE", "PUERTO VARAS", "CASTRO", "ANCUD", "CHONCHI", "CURACO DE VÉLEZ", "DALCAHUE", "PUQUELDÓN", "QUEILÉN", "QUELLÓN", "QUEMCHI", "QUINCHAO", "OSORNO", "PUERTO OCTAY", "PURRANQUE", "PUYEHUE", "RÍO NEGRO", "SAN JUAN DE LA COSTA", "SAN PABLO", "CHAITÉN", "FUTALEUFÚ", "HUALAIHUÉ", "PALENA"],
+    "REGIÓN DE AYSÉN DEL GRAL. CARLOS IBÁÑEZ DEL CAMPO": ["COYHAIQUE", "LAGO VERDE", "AYSÉN", "CISNES", "GUAITECAS", "COCHRANE", "O'HIGGINS", "TORTEL", "CHILE CHICO", "RÍO IBÁÑEZ"],
+    "REGIÓN DE MAGALLANES Y DE LA ANTÁRTICA CHILENA": ["PUNTA ARENAS", "LAGUNA BLANCA", "RÍO VERDE", "SAN GREGORIO", "CABO DE HORNOS", "ANTÁRTICA", "PORVENIR", "PRIMAVERA", "TIMAUKEL", "NATALES", "TORRES DEL PAINE"]
+};
+
+const mapaComunas = {};
+for (const region in regionesChile) {
+    regionesChile[region].forEach(comuna => {
+        mapaComunas[comuna] = region;
+    });
+}
+
+document.getElementById('comuna').addEventListener('input', function(e) {
+    const val = e.target.value.toUpperCase();
+    if (mapaComunas[val]) {
+        document.getElementById('region').value = mapaComunas[val];
+    } else {
+        document.getElementById('region').value = "";
+    }
+});
+
+document.getElementById('comuna').addEventListener('blur', function(e) {
+    const val = e.target.value.toUpperCase();
+    if (val !== "" && !mapaComunas[val]) {
+        alert("Por favor seleccione una comuna válida del buscador.");
+        e.target.value = "";
+        document.getElementById('region').value = "";
+    } else if(mapaComunas[val]) {
+        e.target.value = val; 
+    }
+});
+
+// ─── WEBHOOK DE MAKE ACTUALIZADO ──────────────────────────────────────────────
+const WEBHOOK = "https://hook.us2.make.com/at4l7butpyepuhn3iimkm1gu7vp4d2te";
+
+document.getElementById("form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const btn = document.getElementById("btnSubmit");
+    btn.disabled = true;
+
+    const loaderHTML = `<div class="spinner"></div><span class="loading-text">Generando historial comercial...</span>`;
+    document.getElementById("licencia_box").innerHTML = loaderHTML;
+
+    if(window.innerWidth <= 992) {
+        document.getElementById("licencia_box").scrollIntoView({behavior: "smooth", block: "center"});
+    }
+
+    // Preparando los datos requeridos por la plantilla de Word
+    const payload = {
+        "nombre_completo": document.getElementById('nombre').value,
+        "rut": document.getElementById('rut').value,
+        "genero": document.getElementById('genero').value,
+        "fecha_nacimiento": document.getElementById('fecha_nacimiento').value,
+        "edad": document.getElementById('edad').value,
+        "nacionalidad": document.getElementById('nacionalidad').value,
+        "estado_civil": document.getElementById('estado_civil').value,
+        "direccion": document.getElementById('direccion').value,
+        "comuna": document.getElementById('comuna').value,
+        "region": document.getElementById('region').value,
+        "numero_telefono": document.getElementById('telefono').value,
+        "email": document.getElementById('email').value
+    };
+
+    let segundos = 0;
+    const timer = setInterval(() => {
+        segundos++;
+        btn.innerHTML = `Generando documento... (${segundos}s)`;
+    }, 1000);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 180000);
+
+    try {
+        const res = await fetch(WEBHOOK, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+        clearInterval(timer);
+
+        const data = await res.json();
+
+        // 🔥 FUNCIÓN DE VISTA PREVIA COMPLETA CON PATRÓN DE MARCA DE AGUA 🔥
+        const applyPreview = (url, watermarkText = "PENDIENTE DE PAGO") => {
+            const safeUrl = url + "#toolbar=0&navpanes=0&scrollbar=0&view=Fit";
+            
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="280" height="280"><text x="50%" y="50%" transform="rotate(-45 140 140)" fill="rgba(0,0,0,0.4)" font-size="32" font-family="sans-serif" font-weight="bold" text-anchor="middle">${watermarkText}</text></svg>`;
+            const encodedSvg = encodeURIComponent(svg).replace(/'/g, "%27").replace(/"/g, "%22");
+            
+            return `
+                <iframe class="pdf-frame" src="${safeUrl}" frameborder="0"></iframe>
+                <div class="anti-download-layer"></div>
+                <div class="watermark" style="background-image: url('data:image/svg+xml;utf8,${encodedSvg}'); background-repeat: repeat; z-index: 99;"></div>
+                <div class="blur-overlay"></div>
+            `;
+        };
+
+        // Mantengo 'data.licencia' por si tu respuesta de Make sigue llamándose así. 
+        // Si en Make cambiaste el nombre de la variable de retorno, asegúrate de ajustarlo aquí (ej: data.documento).
+        const pdfUrl = data.licencia || data.documento || data.url;
+
+        if (data.status === "ready" && pdfUrl) {
+            btn.innerHTML = "✅ ¡Documento listo!";
+            btn.style.background = "linear-gradient(135deg, #00c853, #00e676)";
+
+            document.getElementById("licencia_box").innerHTML = applyPreview(pdfUrl);
+            document.getElementById("licencia_box").classList.add("ready");
+
+        } else {
+            throw new Error("Respuesta inesperada del servidor.");
+        }
+
+    } catch (err) {
+        clearTimeout(timeoutId);
+        clearInterval(timer);
+        console.error(err);
+        const msg = err.name === 'AbortError' ? "Tiempo de espera agotado. El documento puede estar siendo generado — revisa tu correo." : "Error al conectar con el servidor.";
+        alert(msg);
+        btn.disabled = false;
+        btn.innerHTML = "Procesar emisión";
+        const errorHTML = '<span style="color:#ff5252; font-size:0.85rem;">Error — intenta nuevamente</span>';
+        document.getElementById("licencia_box").innerHTML = errorHTML;
+    }
+});
+</script>
+
+</body>
+</html>
